@@ -13,13 +13,13 @@ sha256_hash_in_hex(){
   DATA="$@"
   printf "$DATA" | openssl dgst -sha256 | sed -e 's/^.* //'
 }
-hex_of_sha256_hmac_with_string_key_and_value {
+hex_of_sha256_hmac_with_string_key_and_value() {
   KEY="$1"
   DATA="$2"
   shift 2
   printf "$DATA" | openssl dgst -sha256 -hmac "$KEY" | sed -e 's/^.* //'
 }
-hex_of_sha256_hmac_with_hex_key_and_value {
+hex_of_sha256_hmac_with_hex_key_and_value() {
   KEY="$1"
   DATA="$2"
   shift 2
@@ -57,8 +57,8 @@ kSigning=$(hex_of_sha256_hmac_with_hex_key_and_value "$kDate" "usbl1_request")
 signature=$(hex_of_sha256_hmac_with_hex_key_and_value "$kSigning" "$stringToSign")
 
 #Generate headers
-authorizationHeader=$(join_by , $algorithm 'Credential='$accessKey'/'$short_date'/usbl1_request' 'SignedHeaders='$signedHeaders 'Signature='$signature)
+authorizationHeader=$(join_by , $algorithm' Credential='$accessKey'/'$short_date'/usbl1_request' ' SignedHeaders='$signedHeaders ' Signature='$signature)
 dateHeader=$long_date
 
-printf $authorizationHeader
-printf $dateHeader
+echo $authorizationHeader
+echo $dateHeader
