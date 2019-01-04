@@ -1,9 +1,9 @@
 #!/bin/bash
-##########################################################################################
-#Author: Alexander Vellekoop                                                             #
-#Date: January 3 2018                                                                    #
-#Description: Generates the Authentication and Date header for the Usabilla API          #
-##########################################################################################
+##################################################################################################
+#Author: Alexander Vellekoop                                                             	 #
+#Date: January 3 2018                                                                    	 #
+#Description: Generates the Authentication and Date header for the Usabilla API and outputs data #
+##################################################################################################
 join_by() { 
 	local IFS="$1"
 	shift 
