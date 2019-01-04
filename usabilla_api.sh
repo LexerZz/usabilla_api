@@ -9,7 +9,7 @@ join_by() {
 	shift 
 	printf "$*"
 }
-sha256_hash_in_hex(){
+sha256_hash_in_hex() {
   DATA="$@"
   printf "$DATA" | openssl dgst -sha256 | sed -e 's/^.* //'
 }
@@ -25,21 +25,30 @@ hex_of_sha256_hmac_with_hex_key_and_value() {
   shift 2
   printf "$DATA" | openssl dgst -sha256 -mac HMAC -macopt "hexkey:$KEY" | sed -e 's/^.* //'
 }
-
-#Initialize variables
+#########################################
+#Fill in your credentials
+#########################################
 accessKey='accessKey'
 secretKey='secretKey'
-host='host:data.usabilla.com'
+#API limit per call. Maximum is 100.
+limit=100
+#Fill in the offset in timestamp milliseconds. At the bottom a new offset is generated.
+offset=0
 #Insert usabilla uri
 uri='/live/websites/campaign/*/results'
+#########################################
+
+host='host:data.usabilla.com'
 method='GET'
 algorithm='USBL1-HMAC-SHA256'
 short_date=$(date +%Y%m%d)
-long_date=$(date +%Y%m%dT%H%M%SZ)
+#long_date=$(date +%Y%m%dT%H%M%SZ)
+long_date='20190104T114015Z'
 credentialScope=$short_date'/usbl1_request'
+queryParameters='limit='$limit'&since='$offset
+url='https://data.usabilla.com'$uri'?'$queryParameters
 #Encode wildcard asterisk
 uri=$(echo $uri | sed -e "s/*/%%2A/g")
-queryParameters=''
 canonicalHeaders=$host'\nx-usbl-date:'$long_date'\n'
 signedHeaders='host;x-usbl-date'
 requestPayload=$(sha256_hash_in_hex)
@@ -60,5 +69,9 @@ signature=$(hex_of_sha256_hmac_with_hex_key_and_value "$kSigning" "$stringToSign
 authorizationHeader=$(join_by , $algorithm' Credential='$accessKey'/'$short_date'/usbl1_request' ' SignedHeaders='$signedHeaders ' Signature='$signature)
 dateHeader=$long_date
 
-echo $authorizationHeader
-echo $dateHeader
+#Generate data and new offset
+data=$(curl --header "Authorization: $authorizationHeader" --header "x-usbl-date: $dateHeader" $url)
+offset=$(echo $data | jq -r '.lastTimestamp') #requires jquery
+
+#Store data in file 
+echo $data >'data_usabilla_'$offset.json
