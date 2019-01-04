@@ -42,8 +42,7 @@ host='host:data.usabilla.com'
 method='GET'
 algorithm='USBL1-HMAC-SHA256'
 short_date=$(date +%Y%m%d)
-#long_date=$(date +%Y%m%dT%H%M%SZ)
-long_date='20190104T114015Z'
+long_date=$(date +%Y%m%dT%H%M%SZ)
 credentialScope=$short_date'/usbl1_request'
 queryParameters='limit='$limit'&since='$offset
 url='https://data.usabilla.com'$uri'?'$queryParameters
